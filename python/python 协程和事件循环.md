@@ -1,5 +1,6 @@
 #python 异步和事件驱动模型
-##1、协程
+
+## 1、协程
 >协程 是为非抢占式多任务产生子程序的计算机程序组件，协程允许不同入口点在不同位置暂停或开始执行程序
 
 * 　协程就是你可以暂停执行的函数，可以理解成就像生成器一样。
@@ -52,7 +53,7 @@ simple_coro(12)  # 已经预激
 
 
 
-##2、yield from
+## 2、yield from
 >yield from 是 Python3.3 后新加的语言结构。和其他语言的await关键字类似，它表示：*在生成器 gen 中使用 yield from subgen()时，subgen 会获得控制权，把产出的值传个gen的调用方，即调用方可以直接控制subgen。于此同时，gen会阻塞，等待subgen终止。
 
 * Python3.5中的async/await的原理是由Python 3.3中的yield from 和Python3.4中的asyncio 组合得来。
@@ -98,9 +99,9 @@ simple_coro(12)  # 已经预激
 
 : https://segmentfault.com/a/1190000009781688
 
-		**作者说这是流畅的python的读书笔记**
+　　**作者说这是流畅的python的读书笔记**
 
-##3、事件循环：
+## 3、事件循环：
 >事件循环是一种等待程序分配事件或消息的编程架构。基本上来说事件循环就是。"当A发生时，就执行B".
 
 
