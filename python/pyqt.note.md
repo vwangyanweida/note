@@ -84,26 +84,91 @@
 		- 行编辑器
 		- 数值设定框
 		- 滑块部件
+		- **注意的类**
 
 2. qt designer 中所有控件对应的需求
 
 	- 按钮组
-	 	> 触发各种按钮事件
+	 
+	 - Push Button：按钮
+	 -	Tool Buuton：工具按钮
+	 - 	Radio button：单选框框	
+	 - 	Check Box：多选框
+	 -	Command Link Button：命令连接按钮
+	 -	Button Box：按钮盒
+
 	- 输入控件组
-	 	Push Button
+	
+	 	- Combo Box ：组合框
+		- Font Combo Box:字体组合框
+		- Line Edit：行编辑
+		- Text Edit：文本编辑
+		- Plain Text Edit:纯文本编辑
+		- Spin Box：数字显示框
+		- Double Spin Box：双自旋盒
+		- Time Edit：时间编辑
+		
+		- **注意的类**：
+			- QDateTime 获取系统时间
+			- Qtime类：定时器，可以定时发送timeout()信号，触发slottimedone槽
 
 	- 显示控件组
+		- Label：标签
+		- Text Browser：文本浏览器
+		- Graphics View：图形视图
+		- Calendar：日历
+		- LCD Number 液晶数字
+		- Progress Bar 进度条
+		- Horizontal Line：水平线
+		- Vertical Line :垂直线
+		- QDeclarative View：向QML暴露数据
+		- QWebView: Web视图
+		
+		- **注意的类**：
+			- Text Browser对应于QtextBroser类。QTextBrowser继承于QTextEdit类且是只读的，具有多个属性
 	 
-	- 空间建个组
-	 
+	- 空间间隔组
+	 	- Horizontal Spacer：水平间隔
+	 	- Vertical Spacer：垂直间隔 用来填满空间
+	 	
 	- 布局管理组
-	 
+		- Vertical Layout：垂直布局
+		- Horizontal Layout：横向布局
+		- Grid Layout：网格布局
+		- From Layout：表格布局
+		
 	- 容器组
-	 
-	- 项目视图组
-	
-	- 项目控件组
+		- Group Box:组框
+		- Scroll Area：滚动区域
+		- Tool Box：工具箱
+		- Tab Widget：标签小部件
+		- Stacked Widget：堆叠部件
+		- Frame：帧
+		- Widget：小部件
+		- MdiArea：MDI区域
+		- Dock Widget：停靠窗体部件
+		- QAx Wdiget:封装Flash的Activex控件
+		
+		- **注意的类**
+			- Widget对应的类是QWidget。
+				> QWidget是所有的QT Gui界面类的基类，它接受鼠标、键盘及其他窗口事件，并在显示器上绘制自己。
+				- 构造函数： QWidget（Qwidget *parent=0， QT::WindosFlags f=0）
+					- parent：父窗口，没指定表明新建一个窗口，否则是parent的子窗口部件。
+					- f：窗口标识：定义了窗口部件类型的窗口类型和窗口提示。窗口类型指定窗口系统属性只能一个。出啊口提示定义顶层窗口的外观，可以多个。
+				
 
+	- 项目视图组
+		- List View：清单视图
+		- Tree View：树视图
+		- Table View：表视图
+		- Column View：列视图
+		
+		- **注意的类**
+			
+	- 项目控件组
+		- List Widget：清单控件
+		- Tree Widget：树形控件
+		- Table Widget：表控件
 
 
 #### 2. 布局管理
