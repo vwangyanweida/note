@@ -51,7 +51,7 @@
 - pyqt5只支持新型的信号和槽handlig。电话signal()或slot()不再支持。
 - pyqt5不支持Qt的API被标记为过时或陈旧的任何部分在QT V5.0。
 
-### 3. qtcreator4快速入门
+### 3. qtcreator快速入门
 
 ####1.窗口部件
 >窗口部件就是没有嵌入其他部件的部件，一般有边框和标题。QMainWindow和QDialog是最一般的窗口。
@@ -62,6 +62,47 @@
 
 		- 默认基类： QMainWindow、QWidget、QDialog 三类。
 		- QWidget 有两个参数：父类、窗口标志。窗口标志可以是窗口类型和窗口标志的或。
+			**窗口标志可以调节很多东西，比如只显示一个关闭x，就是设置这个标志，所有窗口相关设置都在这里。**
+				
+				Widget: 是一个窗口或部件，有父窗口就是部件，没有就是窗口
+				Window: 是一个窗口，有窗口边框和标题
+				Dialog: 是一个对话框窗口
+				Sheet: 是一个窗口或部件Macintosh表单
+				Drawer: 是一个窗口或部件Macintosh抽屉
+				Popup: 是一个弹出式顶层窗口
+				Tool: 是一个工具窗口
+				ToolTip: 是一个提示窗口，没有标题栏和窗口边框
+				SplashScreen: 是一个欢迎窗口，是QSplashScreen构造函数的默认值
+				Desktop: 是一个桌面窗口或部件
+				SubWindow: 是一个子窗口
+				ForeignWindow: 
+				CoverWindow:
+				WindowType_Mask:
+				MSWindowsFixedSizeDialogHint:
+				MSWindowsOwnDC:
+				BypassWindowManagerHint:
+				X11BypassWindowManagerHint:
+				FramelessWindowHint: 创建一个无标题、无边框的窗口
+				WindowTitleHint: 为窗口修饰一个标题栏
+				WindowSystemMenuHint: 为窗口修饰一个窗口菜单系统
+				WindowMinimizeButtonHint: 为窗口添加最小化按钮
+				WindowMaximizeButtonHint: 为窗口添加最大化按钮
+				WindowMinMaxButtonsHint: 为窗口添加最大化和最小化按钮
+				WindowContextHelpButtonHint:
+				WindowShadeButtonHint:
+				WindowStaysOnTopHint:
+				WindowTransparentForInput:
+				WindowOverridesSystemGestures:
+				WindowDoesNotAcceptFocus:
+				MaximizeUsingFullscreenGeometryHint:
+				CustomizeWindowHint: 关闭默认窗口标题提示
+				WindowStaysOnBottomHint:
+				WindowCloseButtonHint:
+				MacWindowToolBarButtonHint:
+				BypassGraphicsProxyWidget:
+				NoDropShadowWindowHint:
+				WindowFullscreenButtonHint:
+
 
 	2. 对话框
 		- 模态和非模态对话框：
@@ -187,3 +228,5 @@
 
 7. http与数据库
 	
+### 碰到的问题
+1. 原生qt里，是可以直接操作字符串的，显示，读取都可以。注意隐藏的模块要先显示才可以看到。
