@@ -51,9 +51,7 @@
 - pyqt5只支持新型的信号和槽handlig。电话signal()或slot()不再支持。
 - pyqt5不支持Qt的API被标记为过时或陈旧的任何部分在QT V5.0。
 
-### 3. qtcreator快速入门
-
-####1.窗口部件
+### 3. qtcreator窗口部件
 >窗口部件就是没有嵌入其他部件的部件，一般有边框和标题。QMainWindow和QDialog是最一般的窗口。
 
 1. 基础窗口部件：
@@ -118,14 +116,6 @@
 		- 多窗口切换
 		
 		- 标准对话框
-
-	3. 其他窗口部件
-		- QFrame类族
-		- 按钮部件
-		- 行编辑器
-		- 数值设定框
-		- 滑块部件
-		- **注意的类**
 
 2. qt designer 中所有控件对应的需求
 
@@ -212,21 +202,75 @@
 		- Table Widget：表控件
 
 
-#### 2. 布局管理
-	1. 布局管理系统
-	2. 设置伙伴
-	3. 设置tab
-	
-
+###4. 基本对话框
+1. 标准文件对话框
+	1. QFileDialog：
+		1. getOpenFileName返回文件名或空串
+		2. 静态函数
+		3. 参数：
 		
+				(QWidget *parent=0,	父窗口
+				const QString & caption=QString(), 标题名
+				cosnt QString & dir=QString（），默认目录或文件名
+				const QString & filter=QString()， 过滤,(类型或其他）
+				QString * selectedFilter=0，用户选择的过滤器通过此参数返回
+				Options options=0  选择显示文件名的格式，默认同时选择目录和文件名
+				)
+2. 标准颜色对话框
+	1. getColor()静态函数，返回选择的颜色值
+	2. 参数
+		
+			（const QColor& initial=Qt::white, 默认白色
+			  QWidget* parent=0）
+	3. 选中颜色后，
+		1. QColor c = QColorDialog::getColor(Qt::blue); 
+		2. QFrame->setPalettr(QPalette(c)) 绘制颜色
 
-4. 事件系统
+3. 标准字体对话框
+	1. getFont()是QFontDialog类的静态函数，返回选择的字体
+	2. 参数：
+	3. 
+			QFont getFont(bool* ok,  用户是否ok
+			QWidget* parent=0)		父窗口
 
-5. Qt对象模型与容器类
+4. 标准输入对话框
+5. 消息对话框
+6. 自定义消息框
+7. 工具盒类
+8. 进度条
+	1. QProgressBar：任务完成情况
+		1. 
+	2. QProgressDialog：慢速过程
+9. 调色板喝电子钟
+10. 可扩展对话框
+11. 不规则窗体
+	> 利用setMask()为窗体设置遮罩，实现不规则窗体。设置遮罩后窗体尺寸不变，但是有的地方不可见。
+	1.  
+12. 程序启动画面
+	1. Qt中提供QSplashScreen类实现了在程序启动过程中显示启动画面的功能。
 
-6. 界面外观
+###5. 主窗口 QMainWindow
+1. 包含：菜单栏、工具栏、锚接部件、状态栏及中心部件
+2. 菜单栏
+	1. Action来表示菜单、工具按钮、键盘快捷方式等命令。
+3. 状态栏
 
-7. http与数据库
+4. 工具栏
+	1. 可以有多个，可以停靠在四个方向上
+5. 锚接部件
+	>作为一个容器使用，以包容其他窗口部件来实现某些功能。
+6. 中心部件
+	**QMainWindow具有自己的布局管理器，因此在QMainWindow窗口上设置布局管理器或者创建一个父窗口部件作为QMainWindow的布局管理器都是不允许的，但可以在中心部件上设置管理器**
+7. 上下文菜单
+	
+	为了实现控制主窗口工具栏喝锚接器的显隐，QMainWindow提供了一个上下文菜单，可以通过单机右键激活，也可以通过QMainWindow::createPopupMenu()激活菜单。也可以重写createPopupMenu()函数实现自定上下文菜单。
+		
+###6. 文件
+
+###7. 网络通信
+
+###8. 模型和视图
+
 	
 ### 碰到的问题
 1. 原生qt里，是可以直接操作字符串的，显示，读取都可以。注意隐藏的模块要先显示才可以看到。
