@@ -309,11 +309,55 @@
 	
 	2. 文件系统浏览实例
 		1. 文件系统的浏览是目录操作的一个常用功能
+		2. QDir的entryInfoList()方法是按照某种过滤方式获得目录下的文件列表
+				
+				QFileInfoList QDir::entryInfoList{
+					const QStringList &nameFileters,
+						//此参数指定了文件名的过滤方式，如“*”，“.tar.gz”
+					Filters filters=NoFileter，
+						//此参数指定了文件属性的过滤方式，如目录、文件、读写属性等
+					SortFlags sort=NoSort
+						//此参数指定 了列表的排序情况
+				} const
+
+		3. QDir::Filter 定义了一系列的过滤方式
+			- QDir::Dirs       所有目录
+			- QDir::AllDirs    所有目录，不管过滤方式
+			- QDir::Files	   只列出文件
+			- QDir::Drives	   列出磁盘驱动器
+			- QDir::NoSymLinks 不列出符号链接
+			- QDir::NoDotAndDotDot 不列出“.”和“..”
+			- QDir::AllEntries  列出目录、文件和磁盘驱动器，相当于  Dirs|Files|Drives
+			- QDir::Readable    列出所有具有"读"属性的文件和目录
+			- QDir::Writeable   列出所有具有"写"属性的文件和目录
+			- QDir::Executable  列出所有具有"执行"属性的文件和目录
+			- QDir::Modified    只列出被修改的过的文件（UNIX系统）无效
+			- QDir::HIdden      列出隐藏文件（在UNIX系统下，隐藏文件名以"."开始
+			- QDir::System      列出系统文件（在UNIX系统下指FIFO、套接字和设备文件)
+			- QDir::CaseSensitive  文件系统如果区分文件名大小写，则按大小写方式进行过滤
+	
+		4. QDir::SortFlag 定义了一系列排序方式
+			- Qdir::Name   按名字排序
+			- Qdir::Time   修改时间排序
+			- Qdir::Size   文件大小
+			- Qdir::Type   类型排序
+			- Qdir::Unsorted 不排序
+			- Qdir::DirsFirst 目录优先排序
+			- Qdir::DirsLast  目录最后排序
+			- Qdir::Reversed  反序
+			- Qdir::IgnoreCase 忽略大小写方式排序
+			- Qdir::LocaleAware 当前本地排序
+				
 	
 4. 获取文件信息
+	1. QFileInfo类提供了对文件进行操作时获得的文件相关属性信息，包括文件名、文件大小、创建时间、最后修改时间、最后访问时间和是否为目录、文件或符号链接和读写属性
 
 5. 监视文件和目录变化
-
+	1. QFileSystemWatcher 类监视文件和目录的改变
+	2. addPath()函数监视指定的文件和目录时，如果需要监视多个目录，可以使用addPaths函数加入监视
+	3. 移除不需要监视的目录，使用removePath()和removePaths()函数
+	4. 当监视的文件被修改或删除时，产生一个fileChanged()信号
+	5. 当监视的目录被改变和删除，将产生directoryChanged()信号。
 6. 删除
 
 ###7. 网络通信
