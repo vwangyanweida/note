@@ -201,6 +201,21 @@
 		- Tree Widget：树形控件
 		- Table Widget：表控件
 
+	- 其他
+		- QTimer类提供了重复和单次触发信号的定时器。
+			- 重复触发信号
+			
+					QTimer *timer =  new QTimer(this);
+					connect(timer, SIGNAL(timeout()),this,SLOT(update()));
+					timer->start(1000);		/ms
+					start()之后，每隔一千毫秒就是1秒就会触发一次timeout信号
+
+			- 单次触发
+				>以通过设置setSingleShot(true)来让定时器只执行一次。也可以使用静态函数QTimer::singleShot()：
+			
+					QTimer::singleShot(200, this, SLOT(updateCaption()));
+
+
 
 ###4. 基本对话框
 1. 标准文件对话框
@@ -266,11 +281,112 @@
 	为了实现控制主窗口工具栏喝锚接器的显隐，QMainWindow提供了一个上下文菜单，可以通过单机右键激活，也可以通过QMainWindow::createPopupMenu()激活菜单。也可以重写createPopupMenu()函数实现自定上下文菜单。
 		
 ###6. 文件
+1. 读写文本文件：通常两种方法。
+	1. 利用传统的QFile类方法：
+		1. 这个主意如果打开文件路径是相对路径的话，相对路径的根目录是编译文件的根目录。
+
+	2. 利用更为方便的QTextStream类方法
+		1. 这个类可以操作QIODevice、QByteArray和QString
+		
+2. 读写二进制文件
+	1. QDataStream 提供了将二进制文件串行化的功能。用于实现C++基本数据类型，如char、short、int、char*等的串行化。更复杂的串行化则是通过将数据类型分解为基本类型来完成。
+	2. **Qt本身定义的类型直接输出文件中基本都是二进制的，读的时候注意读到相应的类型上面。** 
+	
+3. 目录操作与文件系统：QDir类具有存取目录结构和内容的能力，可以操作目录、存取目录或文件信息、操作底层文件系统，还可以存取Qt的资源文件。
+
+	1. 文件大小和文件信息
+		1. 使用"/"作为通用的目录分隔符和URL路径分隔符
+		2. 可以使用相对路径或者绝对路径指向一个文件。isRelative()和isAbsolute()函数可以判断QDir()对象使用的是相对路径还是绝对路径。
+		3. 讲一个相对路径转为换绝对路径，使用makeAbsolute()函数。
+		4. 目录的路径可以使用path()来返回。setPath()函数设置新的路径。absolutePath()返回绝对路径。dirName()获得目录名，它通常返回绝对路径的最后一个元素，如果在当前目录则返回"."。
+		5. cd()和cdUp()用来改变目录的路径。
+		6. mkdir()创建目录
+		7. rename()改变目录名
+		8. remove函数删除文件，rmdir删除目录
+		9. count统计总条目数，entryList返回目录下所有条目组成的字符串链表。
+		10. exists()判断目录是否存在
+		11. 目录属性通过使用isReadable()、isAbsolute()、isRelative()和isRoot()获取。
+	
+	2. 文件系统浏览实例
+		1. 文件系统的浏览是目录操作的一个常用功能
+	
+4. 获取文件信息
+
+5. 监视文件和目录变化
+
+6. 删除
 
 ###7. 网络通信
+1. pyqt的网络通信中，udp的传送和接收没有文档也看不到源代码，它们传送的格式一般为bytes，注意编解码，recevie datagram时，接收到的是一个三元素元组，注意解包。
+
+2. **readyread()**是QIODevice的signal，QTcpSocket继承此类。QIODevice是所有输入输出设备的一个抽象类，其中定义了基本的接口，在Qt中，QTcpSocket也被看作一个QIODevice，readyRead()信号在有数据到来时发出。
+
+3. Qt网络既可以操作udp，tcp等底层链接，也提供来了封装好的QNetworkRequest、QNetworkReply和QNetworkAccessManager这几个高层的类，他们提供更加简单和强大的借口。
+
+### Qt 多线程
+1. 多线程实现：继承QThread，重写run方法。
+2. 多线程控制
+	1. 互斥量： 通过QMutex或者QMutexLocker类实现
+		1. QMutex类 
+			1. lock()函数用于锁住互斥量，如果互斥量处于解锁状态，则当前线程立刻抓住他并锁定，否则阻塞到持有互斥量的线程解锁。unlock解锁。
+			2. tryLock()函数，如果互斥量已被锁定，则立即返回。不会阻塞。
+			
+		2. QMutexLocker类：
+			 > QMutexLocker用来简化互斥量的处理，它在构造函数中接收一个QMutex对象作为参数并将其锁定，在析构函数中解锁这个互斥量。
+			 	
+				class Key{
+				public:
+					Key(){key=0;}
+					int creatKey(){QMutexLocker.locker(&mutex);  ++key; return key;}
+					int value() const {QMutexLocker.locker(&mutex); return key;}
+				private:
+					int key;
+					QMutex mutex;
+				};
+
+			
+	2. 信号量
+		1. 互斥锁只能锁定一次而信号量可以获取多次，它可以用来保护一定数量的同种资源。典型用例是保护生产者消费者之间共享的环形缓冲区。
+		
+	3. 等待与唤醒：QWaitCondition，允许线程在一定条件下唤醒其他线程。
+		1. 
+注：
+1. 线程因为将因为调用printf()而持有一个控制I/O锁(lock)，多个线程同事调用printf函数在某些情况下将造成控制台输出阻塞，而是用Qt提供的qDebug()函数作为控制台输出则不会出现上述问题。
+ 
 
 ###8. 模型和视图
 
 	
 ### 碰到的问题
 1. 原生qt里，是可以直接操作字符串的，显示，读取都可以。注意隐藏的模块要先显示才可以看到。
+
+2. Qt里的tr函数
+
+	>函数tr()的原型是QObject::tr(),被它处理的字符串可以使用工具提取出来翻译成其他语言，也就是国际化使用。
+	
+	>如果想让你的程序实现国际化，那么就在用户所有可见的字符串处都使用QObject::tr()!但是我们在使用的过程中通常是使用tr()，而并非是 QObject::tr()，这是为什么呢？原来，tr()函数是定义在QObject里面的，所有使用了Q_OBJECT宏的类都自动具有tr()的函数。和connect函数一样，都是继承了QObject所以能够直接使用。
+
+
+3. Qt中在按钮上显示字符'&'：
+	1. 通常使用含字符'&'的字符串为按钮的显示名称，如果设置按钮的text为 "&Cancel",
+即设置text, setText("&Cancel");或创建时 QPushButton *pushButton = new QPushButton (QObject::tr("&Cancel"));
+Qt的编译器会将字符'&'后的'C'在显示时下方多一下划线，表明'C'为该按钮的快捷键，通过"Alt＋c"操作来实现对pushButton的点击。
+	2. 有的时候，我们会有这种需求，想在按钮上或别的控件上以包括字符'&'为显示名如"Cancel&Exit"，这样字符串中的'&'需要对其进行转义，
+通常我们会想到使用"/"来实现，试过发现不行，后来，直接使用'&'来转义没想到出现了想要的效果。即tr("Cancle&&Exit")。
+
+4. Qtl里可能使用unicode编码，所以可以转换成其他编码来转换字符编码
+
+5. QByteArray
+	>QByteArray适合的两个主要情况是当您需要存储原始二进制数据，并且当内存保护至关重要时（例如，使用嵌入式Linux的Qt）
+	
+	1. 初始化QByteArray的方法
+		1. 是const char *将其传递给其构造函数
+		
+				QByteArray ba("Hello")
+		2. 是使用resize()设置数组的大小，并初始化每个字节的数据字节.
+
+	2. QByteArray使用基于0的索引，就像C ++数组一样。 
+		
+		要访问特定索引位置的字节，可以使用operator[] ()在非 常量字节数组上，operator 返回一个可以在赋值左侧使用的字节的引用.
+
+	3. 对于只读访问，替代语法是使用at(),at()可以比operator[]更快，因为它不会导致深层拷贝发生。
