@@ -59,62 +59,72 @@
 	1. 窗口、子部件以及窗口类型
 
 		- 默认基类： QMainWindow、QWidget、QDialog 三类。
-		- QWidget 有两个参数：父类、窗口标志。窗口标志可以是窗口类型和窗口标志的或。
-			**窗口标志可以调节很多东西，比如只显示一个关闭x，就是设置这个标志，所有窗口相关设置都在这里。**
-				
-				Widget: 是一个窗口或部件，有父窗口就是部件，没有就是窗口
-				Window: 是一个窗口，有窗口边框和标题
-				Dialog: 是一个对话框窗口
-				Sheet: 是一个窗口或部件Macintosh表单
-				Drawer: 是一个窗口或部件Macintosh抽屉
-				Popup: 是一个弹出式顶层窗口
-				Tool: 是一个工具窗口
-				ToolTip: 是一个提示窗口，没有标题栏和窗口边框
-				SplashScreen: 是一个欢迎窗口，是QSplashScreen构造函数的默认值
-				Desktop: 是一个桌面窗口或部件
-				SubWindow: 是一个子窗口
-				ForeignWindow: 
-				CoverWindow:
-				WindowType_Mask:
-				MSWindowsFixedSizeDialogHint:
-				MSWindowsOwnDC:
-				BypassWindowManagerHint:
-				X11BypassWindowManagerHint:
-				FramelessWindowHint: 创建一个无标题、无边框的窗口
-				WindowTitleHint: 为窗口修饰一个标题栏
-				WindowSystemMenuHint: 为窗口修饰一个窗口菜单系统
-				WindowMinimizeButtonHint: 为窗口添加最小化按钮
-				WindowMaximizeButtonHint: 为窗口添加最大化按钮
-				WindowMinMaxButtonsHint: 为窗口添加最大化和最小化按钮
-				WindowContextHelpButtonHint:
-				WindowShadeButtonHint:
-				WindowStaysOnTopHint:
-				WindowTransparentForInput:
-				WindowOverridesSystemGestures:
-				WindowDoesNotAcceptFocus:
-				MaximizeUsingFullscreenGeometryHint:
-				CustomizeWindowHint: 关闭默认窗口标题提示
-				WindowStaysOnBottomHint:
-				WindowCloseButtonHint:
-				MacWindowToolBarButtonHint:
-				BypassGraphicsProxyWidget:
-				NoDropShadowWindowHint:
-				WindowFullscreenButtonHint:
+		- **QWidget** 
+			- QWidget 类是所有的用户界面对象的基类。
+			- <font color=blue>QWidget继承自QObject类和QPaintDevice类</font>
+				- QObject类是所有支持Qt对象模型(Qt Object Model)的基类
+				- QPaintDevice类是所有可以绘制的对象的基类。
+			- 有两个参数：父类、窗口标志。窗口标志可以是窗口类型和窗口标志的或。
+				**窗口标志可以调节很多东西，比如只显示一个关闭x，就是设置这个标志，所有窗口相关设置都在这里。**
+			- 窗口标志
+			
+					Widget: 是一个窗口或部件，有父窗口就是部件，没有就是窗口
+					Window: 是一个窗口，有窗口边框和标题
+					Dialog: 是一个对话框窗口
+					Sheet: 是一个窗口或部件Macintosh表单
+					Drawer: 是一个窗口或部件Macintosh抽屉
+					Popup: 是一个弹出式顶层窗口
+					Tool: 是一个工具窗口
+					ToolTip: 是一个提示窗口，没有标题栏和窗口边框
+					SplashScreen: 是一个欢迎窗口，是QSplashScreen构造函数的默认值
+					Desktop: 是一个桌面窗口或部件
+					SubWindow: 是一个子窗口
+					ForeignWindow: 
+					CoverWindow:
+					WindowType_Mask:
+					MSWindowsFixedSizeDialogHint:
+					MSWindowsOwnDC:
+					BypassWindowManagerHint:
+					X11BypassWindowManagerHint:
+					FramelessWindowHint: 创建一个无标题、无边框的窗口
+					WindowTitleHint: 为窗口修饰一个标题栏
+					WindowSystemMenuHint: 为窗口修饰一个窗口菜单系统
+					WindowMinimizeButtonHint: 为窗口添加最小化按钮
+					WindowMaximizeButtonHint: 为窗口添加最大化按钮
+					WindowMinMaxButtonsHint: 为窗口添加最大化和最小化按钮
+					WindowContextHelpButtonHint:
+					WindowShadeButtonHint:
+					WindowStaysOnTopHint:
+					WindowTransparentForInput:
+					WindowOverridesSystemGestures:
+					WindowDoesNotAcceptFocus:
+					MaximizeUsingFullscreenGeometryHint:
+					CustomizeWindowHint: 关闭默认窗口标题提示
+					WindowStaysOnBottomHint:
+					WindowCloseButtonHint:
+					MacWindowToolBarButtonHint:
+					BypassGraphicsProxyWidget:
+					NoDropShadowWindowHint:
+					WindowFullscreenButtonHint:
 
 
 	2. 对话框
-		- 模态和非模态对话框：
+		- <font color=red>模态和非模态对话框</font>：
 			> 模态对话框就是没有关闭它之前，不能在于同一个应用程序的其他窗口进行交互，比如新建项目时的对话框。非模态对话框，既可以与它交互，也可以与统一程序中的其他程序交互。
 			
-			- 如果想要是一个对话框成为模态对话框，只需调用他的exec()函数，而要使它成为非模态对话框，使用new操作来创建，然后show()函数创建。使用show函数和可以建立模态对话框，只需哟啊在前面使用setModal()函数即可。
+			- **如果想要是一个对话框成为模态对话框，只需调用他的exec()函数，而要使它成为非模态对话框，使用new操作来创建，然后show()函数创建。**
+			- 使用show函数和可以建立模态对话框，只需要在前面使用setModal()函数即可，**注意这和exec是不同的，让对象生存周期超过函数生存周期，就必须使用new创建到堆上，即使用new，而且show没有阻塞程序，所有还是会同事显现两个窗口，只不过需要先操作模态框**。
 				
-			- **不用new创建的对象实在栈空间，new在堆空间，程序离开函数会清除函数栈的数据，new的堆数据必须手动del。子控件不用自己del，父控件会自动清除子控件空间。**
+			- <font color=red>不用new创建的对象是在栈空间，new在堆空间，程序离开函数会清除函数栈的数据，new的堆数据必须手动del。子控件不用自己del，父控件会自动清除子控件空间。</font>
 
-			- exec会阻塞住程序的后续执行，show函数会妈马上将控制权转交给调用者。与setModel相似有setWindowModao函数，可以设置阻塞大的程度参数。
+			- exec会阻塞住程序的后续执行，show函数会妈马上将控制权转交给调用者。与setModel相似有setWindowModao函数，可以设置阻塞大的程度参数。<font color=red>所以调用了多个show，且多个窗体并没有删掉，就会同时显示多个窗体。而是用exec会显示一个窗体，关闭后才可以显示其他窗体。</font>
+			
+			- <font color=blue>模态对话框就是没有关闭它之前，不能再与同一个应用程序的其他窗口进行交互，比如新建项目时的弹出窗口,**exec 的窗体成为模态框**</font>
+			- show执行完就会立即把控制权交给调用者，exec只有对话框关闭后才会返回。
 			 
 
 		- 多窗口切换
-		
+			<font color=blue>ss</font>
 		- 标准对话框
 
 2. qt designer 中所有控件对应的需求
@@ -214,8 +224,6 @@
 				>以通过设置setSingleShot(true)来让定时器只执行一次。也可以使用静态函数QTimer::singleShot()：
 			
 					QTimer::singleShot(200, this, SLOT(updateCaption()));
-
-
 
 ###4. 基本对话框
 1. 标准文件对话框
@@ -367,7 +375,7 @@
 
 3. Qt网络既可以操作udp，tcp等底层链接，也提供来了封装好的QNetworkRequest、QNetworkReply和QNetworkAccessManager这几个高层的类，他们提供更加简单和强大的借口。
 
-### Qt 多线程
+###8. Qt 多线程
 1. 多线程实现：继承QThread，重写run方法。
 2. 多线程控制
 	1. 互斥量： 通过QMutex或者QMutexLocker类实现
@@ -398,10 +406,46 @@
 1. 线程因为将因为调用printf()而持有一个控制I/O锁(lock)，多个线程同事调用printf函数在某些情况下将造成控制台输出阻塞，而是用Qt提供的qDebug()函数作为控制台输出则不会出现上述问题。
  
 
-###8. 模型和视图
+###9. 模型和视图
 
+
+###10. qt程序的发布
+	这个应该是c++需要的，python程序只要有脚本就可以发布了，没有编译后的可执行文件。
+
+###11. ui界面问题
+1. 文件位置
+	1. 在qt designer或者qtcreator里设计好洁面后，保存。
+	2. 如果是pyqt，还需要将ui界面转化为py文件
+	3. c++里的qtcreator里，保存ui文件后，编译，就可以在文件夹汇中看到转换的UI的头文件。
+	4. pyqt的ui转换文件和c++的UI头文件中定义了ui的语言实现。
+2. UI文件内容
+	1. 有setupUI函数，用来生成界面
+	2. 调用retranslateUI函数，实现对窗口里的字符串进行编码转换的功能
+	3. connectSlotsByName静态函数，是的窗口窗口的部件可以实现按对象名进行信号量和槽的关联
+		>void on_button1_clicked()
+		>on_name_action()
+	4. 声明一个命名空间
+3. 
 	
-### 碰到的问题
+
+### 12 编译命令
+1. qtcreator 编译c++工程文件
+	1. qmake -project ：生成pro工程文件
+	2. qmake ：生成平台无关的Makefile文件
+	3. make： 编译程序
+
+2. UI文件编译
+	1. c++ 编译ui文件生成头文件和window cpp文件：  uic -o ui_hellodialog.h hellodialog.ui
+	2. python 编译ui文件生成py文件：
+		1. python pyuic.py "ui文件路径" -o "py文件路径"  这种应该也是和下面的一样的py脚本
+		2. pyuic5 ui_name.ui > py_name.py
+		
+
+### 13. 函数
+1. QDialog
+	1. accept 这个函数是QDialog类的一个槽，一个使用了exec()函数实现的模态对话框执行了这个槽就会隐藏这个模态对话框，并返回QDialog::Accepted值，可以用来判断哪个按钮被按下了，与其对应的还有一个reject()槽，它可以返回一个QDialog::Rejected值。
+
+###注： 碰到的问题
 1. 原生qt里，是可以直接操作字符串的，显示，读取都可以。注意隐藏的模块要先显示才可以看到。
 
 2. Qt里的tr函数
@@ -434,3 +478,27 @@ Qt的编译器会将字符'&'后的'C'在显示时下方多一下划线，表明
 		要访问特定索引位置的字节，可以使用operator[] ()在非 常量字节数组上，operator 返回一个可以在赋值左侧使用的字节的引用.
 
 	3. 对于只读访问，替代语法是使用at(),at()可以比operator[]更快，因为它不会导致深层拷贝发生。
+
+6. 中文乱码问题
+	1. Qt5 取消了Qt4的setCodecForTr等函数
+	2. Qt5 中文转unicode
+			
+			#include <QTextCodec>
+			QByteArray encodedString = "……";
+			QtextCodec *code = QTextCodec::codeForName("GB18030");
+			QString string = code->toUnicode(encodedString);
+	3. unicode 转中文
+			
+			#include <QTextCdoec>
+			QString string = "...";
+			QTextCodec *codec = QTextCodec::codecForName("GB18030");
+			QString encodeString = codec->fromUnicode(string)
+	4. 提示窗显示中文
+		
+			QMessagebox::StandardButton reply;
+			reply = QMessageBox::information(this
+                                , QString::fromLocal8Bit("警告")
+                                , QString::fromLocal8Bit("这样可以正确显示中文"));
+	5. 按钮显示中文
+
+			ui.push_OK->setObjectName(QStringLiteral("这样也可以显示中文"));
