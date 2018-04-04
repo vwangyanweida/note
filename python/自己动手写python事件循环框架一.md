@@ -309,33 +309,47 @@ python 3.5开始语言内置了协程。
 
 
 2. 生成器调用流程：
-	>它使用和普通函数调用相同的构建块 - 代码对象和堆栈帧 - 以获得奇妙的效果。
+	1. 
+		>它使用和普通函数调用相同的构建块 - 代码对象和堆栈帧 - 以获得奇妙的效果。
+	
+			>>> def gen_fn():
+			...     result = yield 1
+			...     print('result of yield: {}'.format(result))
+			...     result2 = yield 2
+			...     print('result of 2nd yield: {}'.format(result2))
+			...     return 'done'
+			...     
+	
+		当Python解释器将gen_fn编译成字节码是，它看到<font color=red>yield</font>语句就知道gen\_fn是一个生成器函数而不是普通函数。它会设置一个标识来记住这个事实。   
+	
+			>>> # The generator flag is bit position 5.
+			>>> generator_bit = 1 << 5
+			>>> bool(gen_fn.__code__.co_flags & generator_bit)
+			True
+		<font color=green>生成器函数的标识是32</font>
+	
+	2. 
+		1. 当你调用一个生成器函数时，Python解释器看到生成器的标志，实际上它没有运行这个函数，相反，它创建了一个生成器。
+	
+				>>> gen = gen_fn()
+				>>> type(gen)
+				<class 'generator'>
+
+		2. python 生成器封装了一个堆栈帧和一些gen_fn主体代码的引用
+				
+				>>> gen.gi_code.co_name
+				'gen_fn'
+		
+		3. 从调用gen_fn生成的所有生成器都指向同样的代码，但是每个生成器都有自己的堆栈帧。这个堆栈帧不在任何实际堆栈上，它在堆内存中等待被使用。
 
 
+	![Figure2-Generators](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/68d845481bfc1c1f1099fed04348279b.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
 
+	<font color=red>堆栈帧中记录着“最后指令”的指针，它是最近执行的指令。在开始时，最后治指令指针是-1，意味着生成器还没有开始</font>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+		>>> gen.gi_frame.f_lasti
+		-1
+	
 
 
 
@@ -361,7 +375,7 @@ python 3.5开始语言内置了协程。
 
 
 
-![Figure2-Generators](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/68d845481bfc1c1f1099fed04348279b.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
+
 
 ![Figure3.3-Yield From](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/c112b26c9b71ee12d36c7f90523b4e29.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
 
