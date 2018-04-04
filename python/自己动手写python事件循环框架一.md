@@ -239,6 +239,117 @@ Let us explain what we mean by that. Consider how simply we fetched a URL on a t
 
 
 ## 5 协同程序（Coroutines）
+通过将高效的回调以经典的多线程外观结合在一起，组合成协同程序的模式。
+
+> 协程：它是一个可以暂停和恢复的子程序。
+
+尽管多线程备操作系统赋予多任务处理的功能，协程也可以协同处理多任务：他们选择合适暂停，以及接下来运行那个协程。
+
+python 3.4 的标准库的协程是基于生成器、Future类和“yield from” 语句来构建的。
+python 3.5开始语言内置了协程。
+
+	@asyncio.coroutine
+    def fetch(self, url):
+        response = yield from self.session.get(url)
+        body = yield from response.read()
+
+
+## 6. Python 生成器如何工作
+
+1. 普通函数的调用流程：
+
+	1. 正常python调用函数流程：python 函数调用另一个函数，这个子函数将获得控制权知道它完成退出或者抛出异常为止，然后控制权返回给顶层函数。
+	
+	2. Python的解释器是C写的，执行Python 函数的C函数叫做PyEval_EvalFrameEx。它会获取一个Python堆栈帧对象并且在帧的上下文中评估Python的字节码。用dis.dis可以看到一个函数的字节码。
+	
+			>>> def foo():
+			...     bar()
+			...
+			>>> def bar():
+			...     pass
+	
+	
+			>>> import dis
+			>>> dis.dis(foo)
+	  		2         0 LOAD_GLOBAL              0 (bar)
+		              3 CALL_FUNCTION            0 (0 positional, 0 keyword pair)
+		              6 POP_TOP
+		              7 LOAD_CONST               0 (None)
+		             10 RETURN_VALUE
+	
+	
+		1. foo 函数加载bar到foo本身的栈帧中，并且调用它，然后从栈帧中弹出bar的返回值，然后加载None到栈帧并且返回None。
+		
+		2. 当PyEval_EvalFrameEx 遇到CALL_FUNCTION字节码时，它会创建一个新的栈帧并且递归调用它。
+		
+		3. <font color=red>Python堆栈帧被分配到堆内存</font>，Python 解释器是一个普通的C程序，所以它的堆栈帧是正常的堆栈帧，但是它操作的Python堆栈帧是在堆上的。
+	
+				>>> import inspect
+				>>> frame = None
+				>>> def foo():
+				...     bar()
+				...
+				>>> def bar():
+				...     global frame
+				...     frame = inspect.currentframe()
+				...
+				>>> foo()
+				>>> # The frame was executing the code for 'bar'.
+				>>> frame.f_code.co_name
+				'bar'
+				>>> # Its back pointer refers to the frame for 'foo'.
+				>>> caller_frame = frame.f_back
+				>>> caller_frame.f_code.co_name
+				'foo'
+	
+		<font color=red>这里foo结束后，函数空间中的变量应该都回收了，但是他的栈帧依旧存在。</font>
+	
+	
+	![Figure1-Function Calls](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/55305d8a05cb671ebfe81b4a164d24db.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
+
+
+2. 生成器调用流程：
+	>它使用和普通函数调用相同的构建块 - 代码对象和堆栈帧 - 以获得奇妙的效果。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -248,7 +359,7 @@ Let us explain what we mean by that. Consider how simply we fetched a URL on a t
 
 参考：[500 lines craw](http://aosabook.org/en/500L/pages/a-web-crawler-with-asyncio-coroutines.html)
 
-![Figure1-Function Calls](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/55305d8a05cb671ebfe81b4a164d24db.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
+
 
 ![Figure2-Generators](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/68d845481bfc1c1f1099fed04348279b.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
 
