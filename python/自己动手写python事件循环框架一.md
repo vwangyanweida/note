@@ -81,15 +81,15 @@
 
 连接的回调函数存储为event_key.data,一旦非阻塞套接字连接，我们将检索并执行它。selector.select是阻塞的，它会一直阻塞到有事件到来，然后调用callback来处理它。<font color=red>这里的callback还是阻塞的，这里的异步是socket是异步，然后可以同时处理大量的socket句柄。</font>
 
-<font color=blue>**一个异步框架基于两个我们展示的功能：（非阻塞的套接字和事件循环）在单个线程上运行并发操作**</font>
+<font color=green>**一个异步框架基于两个我们展示的功能：（非阻塞的套接字和事件循环）在单个线程上运行并发操作**</font>
 
-<font color=blue>我们这里已经实现了“并发”，但不是传统上称之为”并行“的东西，也就是说，我们构建了一个可以重叠I/O的小型系统，它有能力在其他操作执行时，启动一个新的操作。它实际上没有利用多个内核来并行执行计算，但是这个系统是为了I/O约束问题而设计的，而不是cpu约束问题</font>
+<font color=green>我们这里已经实现了“并发”，但不是传统上称之为”并行“的东西，也就是说，我们构建了一个可以重叠I/O的小型系统，它有能力在其他操作执行时，启动一个新的操作。它实际上没有利用多个内核来并行执行计算，但是这个系统是为了I/O约束问题而设计的，而不是cpu约束问题</font>
 
 <font color=red>这个事件循环在并发I/O方面效率很高，因为它不会为每个连接投入线程资源，但纠正一个常见的错误认识，即异步比多线程更快。通常情况下，它不是的。在事件循环服务少量非常活跃的连接时比多线程慢，在没有全局解释器锁的运行时中，线程在这样的工作负载上执行的更好。**异步I/O最社和的场景是有许多慢或者睡眠的连接和偶发事件的应用程序 </font>**
 
 
 ## 4 回调
-
+1. 
 	urls_todo = set(['/'])
 	seen_urls = set(['/'])
 
@@ -114,6 +114,8 @@
 	                          self.connected)
 
 The fetch method begins connecting a socket. But notice the method returns before the connection is established. It must return control to the event loop to wait for the connection. To understand why, imagine our whole application was structured so:
+
+2.
 
 	# Begin fetching http://xkcd.com/353/
 	fetcher = Fetcher('/353/')
@@ -146,6 +148,8 @@ Here is the implementation of connected:
 
 <font color=red>一个真正的应用程序会检查发送的返回值，以防一次发送整个消息。但我们的请求很小而且request里会封装这些接口。它发送请求，等待响应。它必须注册另外一个回调函数并将控制权交给事件循环，下个回调函数是read_response处理服务器的回复</font>
 
+3.
+
     # Method on Fetcher class.
     def read_response(self, key, mask):
         global stopped
@@ -171,9 +175,9 @@ The callback is executed each time the selector sees that the socket is "readabl
 
 上面代码socket每次接受4k数据，如果socket数据小于4k则可以将数据读完，如果大于4k，则进入下一个事件循环，会再次将这个socket返回可读，再次读取数据。直到socket关闭也就是可读事件但读取的数据为空，这时才可以人为这次socket数据接收完了，可以解除注册了。</font>
 
-- <font color=green>查一下客户端接受数据时接受到的数据块的大小的处理？</font>
+- <font color=blue>查一下客户端接受数据时接受到的数据块的大小的处理？</font>
 
-- <font color=green>查一下select方法是水平触发还是边沿触发，如果是边沿触发，那socket仍然可读是不会再返回第二次read信号吧？</font>
+- <font color=blue>查一下select方法是水平触发还是边沿触发，如果是边沿触发，那socket仍然可读是不会再返回第二次read信号吧？</font>
 
 
 	stopped = False
@@ -189,6 +193,8 @@ The callback is executed each time the selector sees that the socket is "readabl
 这个例子使得async的问题变得简单，你需要某种方式表示一系列的计算和io操作，并调度这些操作并发执行。但是<font color=red>如果没有多线程，这一系列操作不应该在一个函数中：一个函数开始一个I/O操作，它会明确的保存任何在将来需要的状态</font>
 
 Let us explain what we mean by that. Consider how simply we fetched a URL on a thread with a conventional blocking socket:
+
+4.
 
 	# Blocking version.
 	def fetch(url):
@@ -207,6 +213,33 @@ Let us explain what we mean by that. Consider how simply we fetched a URL on a t
 	    q.add(links)
 
 
+这个函数是怎么记住io状态和io完成后需要调用的指令？socket.recv是一个io操作，不消耗cpu。程序是怎么知道IO是否已经完成，怎么从IO操作返回到程序，怎么知道io返回时需要调用的指令？这些我们都不用关心，这些是系统和底层语言实现的。系统会记住IO的状态和下个指令的指针。
+
+但是使用基于回调的异步框架，这些语言功能没有任何帮助。<font color=green>这说明socket的IO操作，系统同会记住socket的IO状态和下个指令的地址，这样socket IO状态改变时，系统调用会让socket排队获得cpu，继续执行下条指令，就相当于系统在IO状态改变时，回调socket接下来的指令。**这里可能是只有阻塞socket才可以这样**</font>因此基于回调的异步框架在等待IO时，函数必须显式的保存它的状态，因为函数在IO完成之前返回<font color=red>并丢失他的堆栈帧</font>，而阻塞的socket在同一个函数中完成，函数堆栈还存在。
+
+上例中，我们把函数栈中的变量作为自己的属性(socket，response)来代替系统保存的属性，然后将回调函数指针注册到事件循环来代替系统回调的指令指针。<font color=green>这里没有用到了闭包，注册的回调函数能访问到对象的属性是因为对象方法的第一个参数就是self，c++中的对象方法第一个参数也是对象本身，而所有的方法都在代码区。python里注册回调函数时的self.method其实就相当于method(self),它已经绑定了self对象到第一个参数。偏函数</font>
+
+
+5. 不足之处，随着回调方法的增加会越来越麻烦，而且链式调用的抛出异常不容易定位。
+	
+		Traceback (most recent call last):
+		  File "loop-with-callbacks.py", line 111, in <module>
+		    loop()
+		  File "loop-with-callbacks.py", line 106, in loop
+		    callback(event_key, event_mask)
+		  File "loop-with-callbacks.py", line 51, in read_response
+		    links = self.parse_links()
+		  File "loop-with-callbacks.py", line 67, in parse_links
+		    raise Exception('parse error')
+		Exception: parse error
+	
+	try excetp 也解决不了。
+
+	问题：多线程在于数据竞争，而回调则在于堆栈翻录
+
+
+## 5 协同程序（Coroutines）
+
 
 
 
@@ -214,3 +247,11 @@ Let us explain what we mean by that. Consider how simply we fetched a URL on a t
 
 
 参考：[500 lines craw](http://aosabook.org/en/500L/pages/a-web-crawler-with-asyncio-coroutines.html)
+
+![Figure1-Function Calls](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/55305d8a05cb671ebfe81b4a164d24db.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
+
+![Figure2-Generators](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/68d845481bfc1c1f1099fed04348279b.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
+
+![Figure3.3-Yield From](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/c112b26c9b71ee12d36c7f90523b4e29.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
+
+![Figure3.4-Redirects](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/46887cdb60824b9a620ff25b7df15275.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)

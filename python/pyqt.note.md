@@ -502,3 +502,7 @@ Qt的编译器会将字符'&'后的'C'在显示时下方多一下划线，表明
 	5. 按钮显示中文
 
 			ui.push_OK->setObjectName(QStringLiteral("这样也可以显示中文"));
+
+
+
+
