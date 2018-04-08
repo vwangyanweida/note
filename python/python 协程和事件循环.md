@@ -43,11 +43,11 @@
 
 		simple_coro(12)  # 已经预激
 
-# 使用方法如下
+### 使用方法如下
 
-@coroutinue
-def simple_coro(a):
-    a = yield
+	@coroutinue
+	def simple_coro(a):
+	    a = yield
 
 simple_coro(12)  # 已经预激
 
