@@ -131,9 +131,7 @@ Fiddler是一款强大Web调试工具，它能记录所有客户端和服务器�
 
 	urllib， urllib2， resquest：request可以满足所有需求
 
-## 非结构化数据与结构化数据提取
-
-### 1. 非结构化数据处理
+### 5. 非结构化数据处理
 
 	1. 非结构化的数据处理
 
@@ -156,3 +154,30 @@ Fiddler是一款强大Web调试工具，它能记录所有客户端和服务器�
 			XPath
 			CSS选择器
 			正则表达式
+	3. 类库
+		1. re
+		2. XPath、lxml
+		3. beautifulSoup4
+		4. JsonPath
+		
+
+### 6. 动态HTML处理和机器图像识别
+
+1. Selenium和PhantomJS
+	>Selenuum配合PhantomJS 功能很强大
+	
+	1. 定位UI元素
+	
+		1. find\_element\_by\_id
+		2. find\_elements\_by\_name
+		3. find\_elements\_by\_xpath
+		4. find\_elements\_by\_link\_text
+		5. find\_elements\_by\_partial\_link\_text
+		6. find\_elements\_by\_tag\_name
+		7. find\_elements\_by\_class\_name
+		8. find\_elements\_by\_css\_selector
+
+	2. 鼠标动作链
+		>有些时候，我们需要再页面上模拟一些鼠标操作，比如双击、右击、拖拽甚至按住不动等，我们可以通过导入 ActionChains 类来做到：
+	
+2. Tesseract
