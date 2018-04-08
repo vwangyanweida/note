@@ -60,10 +60,41 @@ simple_coro(12)  # 已经预激
 
 * yield from iterator 本质上相当于：
 
-	**yield from 都可以应用到迭代对象上，所有yield 表达式必须在函数内出现**
+	**yield from 相当于下面表达式，所有yield 表达式必须在函数内出现**
 
 		for x in iterator： #注意这里是可迭代对象，包括生成器和和迭代对象
 			yield x
+
+* 在for循环中，yield from 会首先调用生成器的\_\_iter\_\_方法，然后会调用返回对象的\_\_next\_\_方法，_iter__只调用一次，next每次循环都要调用。
+
+		class B(object):
+	
+	    def __init__(self):
+	        self.i = 0
+	
+	    def __iter__(self):
+	        print("iter")
+	        return self
+	
+	    def __next__(self):
+	        print("next")
+	        if self.i < 10:
+	            self.i += 1
+	            return self.i
+	        else:
+	            raise StopIteration
+
+		def gen(a):
+    		yield from a
+
+
+		iter
+		next
+		1
+		next
+		2
+		next
+		3
 
 * yeild from 可以将生成器串联起来，使返回值可以在调用栈中上下浮动，而不需要对编码进行过多改动。
 
@@ -89,11 +120,18 @@ simple_coro(12)  # 已经预激
 		list(gen())
 		['A', 'B', '1', '2']
 
-* yield from x 表达式对x对象做的第一件事是，调用 iter(x)，获取迭代器。所以要求x是可迭代对象。
+* <font color=green>yield from x 表达式对x对象做的第一件事是，调用 iter(x)，获取迭代器。所以要求x是可迭代对象。如果x有\_\_iter\_\_方法会调用这个方法</font>
 
 　　PEP380 的标题是 ”syntax for delegating to subgenerator“(把指责委托给子生成器的句法)。由此我们可以知道，yield from是可以实现嵌套生成器的使用。
 
 　　yield from 的主要功能是打开双向通道，把最外层的调用方与最内层的子生成器连接起来，使两者可以直接发送和产出值，还可以直接传入异常，而不用在中间的协程添加异常处理的代码。
+
+
+* <font color=red>最内层的生成器的return的返回值，是外层的yield from的返回值</font>
+
+		rv = yield from gen
+		gen return的值是rv的值	
+	
 
 * yield 详解
 
@@ -101,7 +139,58 @@ simple_coro(12)  # 已经预激
 
 　　**作者说这是流畅的python的读书笔记**
 
-## 3、事件循环：
+
+## 3. yield from 和迭代器
+* <font color=green>yield from x 表达式对x对象做的第一件事是，调用 iter(x)，获取迭代器。所以要求x是可迭代对象。如果x有\_\_iter\_\_方法会调用这个方法</font>
+
+* 如果yield from 后面跟的对象是生成器对象，iter返回对象本身，对象的\_\_next\_\_方法执行返回yield的值。如果是可迭代对象，则会先调用iter获得迭代器，然后执行next方法，next方法里面不要再用yield，因为yield from就是直接调用next方法，如果返回值继续用yield，则yield from返回的还是一个生成器对象。
+
+* <font color=green>如果yield from后的对象调用iter返回的对象是一个普通迭代对象，则yield from会调用迭代对象的next方法。如果iter返回的是一个生成器，则yield from会打通到这个生成器的通道，send、next都会传递到这个对象，不会继续调用next方法</font>
+
+		class A(object):
+	    def __init__(self):
+	        self.index = 0
+	
+	    def __iter__(self):
+	        print('!!!!!')
+	        yield self
+	        print("?????????????")
+	        return self
+	
+	    def __next__(self):
+	        if self.index < 10:
+	            self.index += 1
+	            return self.index
+	        else:
+	            raise StopIteration
+	
+		def gen(a):
+		    yield from a
+		
+		# gentor = gen(A())
+		
+		for i in gen(A()):
+		    print(i)
+
+		!!!!!
+		1
+		?????????????
+
+	如果把\_\_iter\_\_的前三行注释掉，
+
+		1
+		2
+		3
+		4
+		5
+		6
+		7
+		8
+		9
+		10
+
+
+## 4、事件循环：
 >事件循环是一种等待程序分配事件或消息的编程架构。基本上来说事件循环就是。"当A发生时，就执行B".
 
 

@@ -68,7 +68,27 @@
 
 	1. 以初始的URL初始化Request，并设置回调函数。 当该request下载完毕并返回时，将生成response，并作为参数传给该回调函数。
 	
-	2. spider中初始的request是通过调用 start_requests() 来获取的。 start_requests() 读取 start_urls 中的URL， 并以 parse 为回调函数生成 Request 。
+	2. spider中初始的request是通过调用 start\_requests() 来获取的。 start\_requests() 读取 start_urls 中的URL， 并以 parse 为回调函数生成 Request 。
+		
+		该方法必须返回一个可迭代对象(iterable)。该对象包含了spider用于爬取的第一个Request。
+		当spider启动爬取并且未制定URL时，该方法被调用。 当指定了URL时，make_requests_from_url() 将被调用来创建Request对象。 该方法仅仅会被Scrapy调用一次，因此您可以将其实现为生成器。
+		
+		该方法的默认实现是使用 start_urls 的url生成Request。
+		
+		如果您想要修改最初爬取某个网站的Request对象，您可以重写(override)该方法。 例如，如果您需要在启动时以POST登录某个网站，你可以这么写:
+
+			class MySpider(scrapy.Spider):
+			    name = 'myspider'
+			
+			    def start_requests(self):
+			        return [scrapy.FormRequest("http://www.example.com/login",
+			                                   formdata={'user': 'john', 'pass': 'secret'},
+			                                   callback=self.logged_in)]
+			
+			    def logged_in(self, response):
+			        # here you would extract links to follow and return Requests for
+			        # each of them, with another callback
+			        pass
 	
 	3. 在回调函数内分析返回的(网页)内容，返回 Item 对象或者 Request 或者一个包括二者的可迭代容器。 返回的Request对象之后会经过Scrapy处理，下载相应的内容，并调用设置的callback函数(函数可相同)。
 	
