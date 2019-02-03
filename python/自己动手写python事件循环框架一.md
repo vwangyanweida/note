@@ -343,15 +343,28 @@ python 3.5开始语言内置了协程。
 		3. 从调用gen_fn生成的所有生成器都指向同样的代码，但是每个生成器都有自己的堆栈帧。这个堆栈帧不在任何实际堆栈上，它在堆内存中等待被使用。
 
 
-	![Figure2-Generators](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/68d845481bfc1c1f1099fed04348279b.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
-
-	<font color=red>堆栈帧中记录着“最后指令”的指针，它是最近执行的指令。在开始时，最后治指令指针是-1，意味着生成器还没有开始</font>
-
-		>>> gen.gi_frame.f_lasti
-		-1
+			![Figure2-Generators](http://aliyunzixunbucket.oss-cn-beijing.aliyuncs.com/jpg/68d845481bfc1c1f1099fed04348279b.jpg?x-oss-process=image/resize,p_100/auto-orient,1/quality,q_90/format,jpg/watermark,image_eXVuY2VzaGk=,t_100,g_se,x_0,y_0)
+		
+			<font color=red>堆栈帧中记录着“最后指令”的指针，它是最近执行的指令。在开始时，最后治指令指针是-1，意味着生成器还没有开始</font>
+		
+				>>> gen.gi_frame.f_lasti
+				-1
 	
+		
+		4. 
+			1. a = yield x ，相当于两步：yield x； a=yield。第一步在yield 返回值时会交出控制权。
+			2. send(None)相当于next().第一步一定要send(None)或者next，因为如果需要传入值时，第一步肯定是先yield出值那步，那个步骤不需要传入参数，仅仅返回。
+
+		5. 生成器可以在任何时间被任何函数唤醒，因为它不在函数的栈帧上，它在堆上。它在函数调用层次结构上的位置是不固定的，它也不用遵守先进后出的执行顺序，它被解放了。
+
+		6. 当执行完next后，在send一次，这时生成器执行到第二个yield，这时生成器多了一个result的本地变量，说明函数刚执行到赋值给第一个yield那里。
+		
+		7. 生成器完成时会抛出一个StopIteration异常，这个异常有一个值，它是生成器返回的：string “done”
 
 
+### 7. 用生成器搭建协程
+
+	
 
 
 

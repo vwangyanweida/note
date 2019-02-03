@@ -65,27 +65,27 @@ simple_coro(12)  # 已经预激
 		for x in iterator： #注意这里是可迭代对象，包括生成器和和迭代对象
 			yield x
 
-* 在for循环中，yield from 会首先调用生成器的\_\_iter\_\_方法，然后会调用返回对象的\_\_next\_\_方法，_iter__只调用一次，next每次循环都要调用。
+* 在for循环中，yield from 会首先调用生成器的\_\_iter\_\_方法，然后会调用返回对象的\_\_next\_\_方法，``__iter__``只调用一次，next每次循环都要调用。
 
 		class B(object):
 	
-	    def __init__(self):
-	        self.i = 0
+		    def __init__(self):
+		        self.i = 0
+		
+		    def __iter__(self):
+		        print("iter")
+		        return self
+		
+		    def __next__(self):
+		        print("next")
+		        if self.i < 10:
+		            self.i += 1
+		            return self.i
+		        else:
+		            raise StopIteration
 	
-	    def __iter__(self):
-	        print("iter")
-	        return self
-	
-	    def __next__(self):
-	        print("next")
-	        if self.i < 10:
-	            self.i += 1
-	            return self.i
-	        else:
-	            raise StopIteration
-
-		def gen(a):
-    		yield from a
+			def gen(a):
+	    		yield from a
 
 
 		iter
